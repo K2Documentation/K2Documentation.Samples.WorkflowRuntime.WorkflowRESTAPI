@@ -1,0 +1,1 @@
+This folder contains additional resources that will help to build or run this sample project. This could include things like K2 deployment packages, sample files, SQL scripts and so on. 

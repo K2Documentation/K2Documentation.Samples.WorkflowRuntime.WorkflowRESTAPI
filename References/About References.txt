@@ -1,0 +1,1 @@
+This folder contains references (such as assemblies) that will help to build or run this sample project.
