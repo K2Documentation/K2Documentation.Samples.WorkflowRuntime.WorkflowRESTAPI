@@ -1,6 +1,9 @@
 # K2Documentation.Samples.WorkflowRuntime.WorkflowRESTAPI
 Use the Workflow REST API to programmatically interact with workflows, for example starting new workflows, retrieving workflow tasks, and completing workflow tasks.
 
+Find more information in the K2 Developers Reference here:
+https://help.k2.com/onlinehelp/k2five/DevRef/current/default.htm#Runtime/WF-REST-API/Workflow-REST-API-Samples.htm
+
 This project contains sample code that demonstrate common uses of the Workflow REST API.
 * Authentication with the Workflow REST API 
 * Retrieve available workflows
