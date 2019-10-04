@@ -41,11 +41,12 @@ namespace WorkflowRestAPI
             System.Net.Http.HttpClient httpClient = new System.Net.Http.HttpClient(loginHandler, true);
 
             string responseBody = httpClient.GetStringAsync(taskURL).Result;
-            WorkflowRestAPI.Task.K2Task task = new WorkflowRestAPI.Task.K2Task();
+            WorkflowRestAPISamples.Tasks_TaskContract.K2Task task = new WorkflowRestAPISamples.Tasks_TaskContract.K2Task();
+            //WorkflowRestAPI.Task.K2Task task = new WorkflowRestAPI.Task.K2Task();
             using (System.IO.MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(responseBody)))
             {
                 DataContractJsonSerializer ser = new DataContractJsonSerializer(task.GetType());
-                task = ser.ReadObject(ms) as WorkflowRestAPI.Task.K2Task;
+                task = ser.ReadObject(ms) as WorkflowRestAPISamples.Tasks_TaskContract.K2Task;
             }
 
             //Do something with the task information
