@@ -74,7 +74,7 @@ namespace WorkflowRestAPISamples
 
             //process the JSON response using a JSON deserializer. 
             //In this case the built-in .NET DataContractSerializer class (you may want to use JSON.NET instead) 
-            //instantiate the DataContract used to parse the returned JSON worklist
+            //instantiate the DataContract used to parse the returned JSON workflow metadata
             WorkflowMetaData workflowMetaData = new WorkflowMetaData();
 
             //Deserialize the response into the workflow metadata object, using the Workflows_WorkflowContract.WorkflowMetaData data contract.
@@ -102,20 +102,19 @@ namespace WorkflowRestAPISamples
         /// </summary>
         /// <param name="WebClient">HttpClient set up with authentication credentials</param>
         /// <param name="WorkflowRestAPIURL">the root URL of the Workflow REST Service (e.g. https://k2.denallix.com/api/workflow/v1) </param>
-        /// <param name="workflowId"></param>
+        /// <param name="workflowId">the workflow definition ID of the workflow to retrieve</param>
         public WorkflowSchema GetWorkflowSchema(System.Net.Http.HttpClient WebClient, string workflowsEndpointURI, string workflowId)
         {
-
             Console.WriteLine("**GetWorkflowSchema starting for workflow id:" + workflowId + "**");
 
             string getWorkflowOperationEndPoint = workflowsEndpointURI + @"/" + workflowId + "/schema";
 
-            //retrieve the authenticated user's available workflows as JSON
+            //retrieve the targeted workflow's schema
             string response = WebClient.GetStringAsync(getWorkflowOperationEndPoint).Result;
 
             //process the JSON response using a JSON deserializer. 
             //In this case the built-in .NET DataContractSerializer class (you may want to use JSON.NET instead) 
-            //instantiate the DataContract used to parse the returned JSON worklist
+            //instantiate the DataContract used to parse the returned JSON workflow schema
             WorkflowSchema workflowSchema = new WorkflowSchema();
 
             //Deserialize the response into the workflow metadata object, using the Workflows_WorkflowContract.WorkflowMetaData data contract.
@@ -141,62 +140,52 @@ namespace WorkflowRestAPISamples
         }
 
 
-        /*
 
-
-
-        public async void StartWorkflow()
+        /// <summary>
+        /// Starts a new instance of a specific workflow. Note that this method requires the REST sample workflow that accompanies this project in the Resources folder
+        /// </summary>
+        /// <param name="WebClient">HttpClient set up with authentication credentials</param>
+        /// <param name="WorkflowRestAPIURL">the root URL of the Workflow REST Service (e.g. https://k2.denallix.com/api/workflow/v1) </param>
+        /// <param name="workflowId">the workflow definition ID of the sample workflow that accompanies this project</param>
+        public void StartWorkflow(System.Net.Http.HttpClient WebClient, string workflowsEndpointURI, string workflowId)
         {
-            //shows how to start a new workflow instance
-            //NOTE: you should be familiar with web request authentication and JSON to use this API
 
-            //define the URI and URL for the workflow instance endpoint
-            //URL for the K2 server 
-            string K2ServerURL = "https://k2.denallix.com";
-            string workflowEndpointURI = @"/Api/Workflow/V1/workflows/";
-            //the workflow definition ID for the workflow that you want to start (get this id from /Workflow/V1/workflows)
-            string workflowid = "10";
-            //build up the URI for the start workflow endpoint
-            string workflowURL = K2ServerURL + workflowEndpointURI + workflowid;
+            Console.WriteLine("**StartWorkflow starting**");
 
-            //set up client and credentials for the web request
-            //we use static windows credentials here for brevity, see authentication samples for other auth mechanisms 
-            string userID = "administrator@denallix.com";
-            string pwd = "K2pass!";
-            NetworkCredential k2credentials = new NetworkCredential(userID, pwd);
-            System.Net.Http.HttpClientHandler loginHandler = new System.Net.Http.HttpClientHandler();
-            {
-                loginHandler.Credentials = k2credentials;
-            };
-            //instantiate the client that we will use to send the request
-            System.Net.Http.HttpClient httpClient = new System.Net.Http.HttpClient(loginHandler, true);
+            string starttWorkflowOperationEndPoint = workflowsEndpointURI + @"/" + workflowId;
 
             //build up the workflow instance object (we will serialize this object later and pass it to the endpoint)
-            //see class definition below for example of the WorkflowINstance class
-            WorkflowRestAPI.StartWorkflow.WorkflowInstance wfInstance = new StartWorkflow.WorkflowInstance();
+            //see class definition for example of the WorkflowInstance class
+            WorkflowRestAPISamples.Workflows_WorkflowInstanceContract.WorkflowInstance wfInstance = new WorkflowRestAPISamples.Workflows_WorkflowInstanceContract.WorkflowInstance();
             wfInstance.Folio = System.DateTime.Now.Ticks.ToString();
             wfInstance.Priority = 1;
-            //if you have datafields or reference fields defined in your datacontract, you will need to instantiate and populate those as well
-            //e.g. wfInstance.DataFields = new StartWorkflow.DataFields();
-            //e.g. wfInstance.DataFields.TextDatafield = "test1";
-            //e.g. wfInstance.DataFields.NumberDatafield = 100;
-            //e.g. wfInstance.DataFields.DateDatafield = System.DateTime.Now;
+            //instantiate and populate the datafields in the workflow
+            wfInstance.DataFields = new Workflows_WorkflowInstanceContract.DataFields();
+            wfInstance.DataFields.BooleanVariable = true;
+            wfInstance.DataFields.DateTimeVariable = System.DateTime.Now;
+            wfInstance.DataFields.DecimalVariable = (long)101.99;
+            wfInstance.DataFields.NumberVariable = 99;
+            wfInstance.DataFields.TextVariable = System.DateTime.Now.Ticks.ToString();
+            wfInstance.DataFields.SampleSmartObjectRecordId = 1;
 
             //serialize the workflow instance to JSON format and read it in
             DataContractJsonSerializer ser = new DataContractJsonSerializer(wfInstance.GetType());
             System.IO.MemoryStream ms = new System.IO.MemoryStream();
             ser.WriteObject(ms, wfInstance);
-       
+
             string encodedJsonObject = Encoding.UTF8.GetString(ms.ToArray());
             //NOTE: if your datafield names have spaces, you may need to edit the serialized string to add the spaces back in. No idea why the serializer strips out spaces in the JSON. 
             //e.g. encodedJsonObject = encodedJsonObject.Replace("TextDatafield", "Text Datafield");
             System.Net.Http.StringContent datacontent = new System.Net.Http.StringContent(encodedJsonObject, Encoding.UTF8, "application/json");
 
             //post the JSON data to the endpoint (for simplicity, we're not doing anything with threading and async here) 
-            var result = httpClient.PostAsync(workflowURL, datacontent).Result;
+            var result = WebClient.PostAsync(starttWorkflowOperationEndPoint, datacontent).Result;
             //do something with the result, if needed
             string resultStatus = result.StatusCode.ToString();
+
+            //wait for user input
+            Console.WriteLine("**StartWorkflow done**");
+            Console.ReadLine();
         }
-        */
     }
 }

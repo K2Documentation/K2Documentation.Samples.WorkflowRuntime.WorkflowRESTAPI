@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Json;
 using System.IO;
 using System.Xml;
 
-namespace WorkflowRestAPI.StartWorkflow
+namespace WorkflowRestAPISamples.Workflows_WorkflowInstanceContract
 {
     // Workflow instance object defined as needed by the Start Workflow REST endpoint. Serialize this object into JSON, then pass into the REST endpoint.
     [DataContract]
@@ -73,22 +73,31 @@ namespace WorkflowRestAPI.StartWorkflow
     /// note to set the .NET datatype for the DataMembers to the appropriate value that will parse
     /// to the underlying datafield/variable type 
     /// </summary>
-
     [DataContract]
     public partial class DataFields
     {
-        // TODO: Define as many fields as needed based on the workflow definition.
-        // [DATAFIELDNAME] is the name of a datafield/variable defined within your workflow.
+        //TODO: Define as many fields as needed based on the workflow definition.
+        //[DATAFIELDNAME] is the name of a datafield/variable defined within your workflow.
         //[DataMember(Name = "[DATAFIELDNAME]")]
         //public string [DATAFIELDNAME] { get; set; }
 
-        [DataMember(Name = "TextDatafield")]
-        public string TextDatafield { get; set; }
+        [DataMember(Name = "TextVariable")]
+        public string TextVariable { get; set; }
 
-        [DataMember(Name = "NumberDatafield")]
-        public int NumberDatafield { get; set; }
+        [DataMember(Name = "NumberVariable")]
+        public int NumberVariable { get; set; }
 
-        [DataMember(Name = "DateDatafield")]
-        public DateTime DateDatafield { get; set; }     
+        [DataMember(Name = "DateTimeVariable")]
+        public DateTime DateTimeVariable { get; set; }
+
+        [DataMember(Name = "BooleanVariable")]
+        public Boolean BooleanVariable { get; set; }
+         
+        [DataMember(Name = "DecimalVariable")]
+        public long DecimalVariable { get; set; }
+       
+        [DataMember(Name = "SampleSmartObjectRecordId")]
+        public int SampleSmartObjectRecordId { get; set; }
+        
     }
 }

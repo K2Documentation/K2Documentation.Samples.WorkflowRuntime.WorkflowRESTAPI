@@ -37,24 +37,24 @@ namespace WorkflowRestAPISamples
             System.Net.Http.HttpClient k2WebClient = WorkflowRestAPISamples.AuthenticationSamples.OAuthSampleNoPrompt(OAUTHSTATICUSERNAME, OAUTHSTATICPASSWORD, OAUTHSTATICRESOURCE, OAUTHSTATICCLIENTID, OAUTHSTATICCLIENTSECRET, OAUTHSTATICOUTH2TOKENURL).Result;
             */
 
-            //retrieve a list of the workflows the user can start
+            //workflows endpoint operations 
             Workflows_Operations workflowOperationsWorker = new Workflows_Operations();
-            workflowOperationsWorker.GetWorkflows(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows");
+            //retrieve a list of the workflows the user can start
+            //workflowOperationsWorker.GetWorkflows(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows");
 
             //describe a specific workflow's metadata
             Console.WriteLine("Enter Id of a workflow to view its metadata");
             string workflowId = Console.ReadLine();
             workflowOperationsWorker.GetWorkflowMetaData(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows", workflowId);
 
-            //retrieve the schema of the workflow definition
+            //retrieve the schema of the workflow definition (not implemented in this sample yet, schema data not being deserialized)
             //WorkflowRestAPISamples.Workflows_WorkflowSchemaContract.WorkflowSchema workflowSchema = workflowOperationsWorker.GetWorkflowSchema(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows", workflowId);
-            
-
-            //TODO
 
             //start a new instance of the sample workflow that accompanies this sample project
-            //TODO
-
+            //NOTE: you must pass in the ID of the sample workflow, because the workflow instance object is defined based on the sample workflow
+            Console.WriteLine("Enter Id of the sample workflow that accompanies this project to start a new instance");
+            workflowId = Console.ReadLine();
+            workflowOperationsWorker.StartWorkflow(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows", workflowId);
 
             //Start TASKS operations 
             //retrieve the task list
