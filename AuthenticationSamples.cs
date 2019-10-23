@@ -37,8 +37,6 @@ namespace WorkflowRestAPISamples
         {
             System.Net.Http.HttpClient k2WebClient = new HttpClient();
 
-            //Token accessToken = await GetElibilityToken(k2WebClient, username, password, resource, clientId, clientSecret, oAuthTokenUrl);
-
             //set up the keys-values for the OAuth token request
             var vals = new List<KeyValuePair<string, string>> {
                 new KeyValuePair < string, string > ("grant_type", "password"),

@@ -23,9 +23,7 @@ namespace WorkflowRestAPISamples
             string PASSWORD = ConfigurationManager.AppSettings["BasicAuthPassword"];
             //instantiate the httpclient we will use to connect to the API. Uses basic authentication
             System.Net.Http.HttpClient k2WebClient = WorkflowRestAPISamples.AuthenticationSamples.BasicAuthHttpClient(USERNAME, PASSWORD);
-
-
-            /*
+          
             //example: use static OAuth credentials using the values from the config file
             string OAUTHSTATICUSERNAME = ConfigurationManager.AppSettings["OAuthStaticUserName"];
             string OAUTHSTATICPASSWORD = ConfigurationManager.AppSettings["OAuthStaticPassword"];
@@ -34,8 +32,7 @@ namespace WorkflowRestAPISamples
             string OAUTHSTATICRESOURCE = ConfigurationManager.AppSettings["OAuthStaticResource"];
             string OAUTHSTATICOUTH2TOKENURL = ConfigurationManager.AppSettings["OAuthStaticOuth2TokenUrl"];
             //call helper method to construct a httpclient with static oauth credentials in the header
-            System.Net.Http.HttpClient k2WebClient = WorkflowRestAPISamples.AuthenticationSamples.OAuthSampleNoPrompt(OAUTHSTATICUSERNAME, OAUTHSTATICPASSWORD, OAUTHSTATICRESOURCE, OAUTHSTATICCLIENTID, OAUTHSTATICCLIENTSECRET, OAUTHSTATICOUTH2TOKENURL).Result;
-            */
+            //System.Net.Http.HttpClient k2WebClient = WorkflowRestAPISamples.AuthenticationSamples.OAuthSampleNoPrompt(OAUTHSTATICUSERNAME, OAUTHSTATICPASSWORD, OAUTHSTATICRESOURCE, OAUTHSTATICCLIENTID, OAUTHSTATICCLIENTSECRET, OAUTHSTATICOUTH2TOKENURL).Result;            
 
             //workflows endpoint operations 
             Workflows_Operations workflowOperationsWorker = new Workflows_Operations();
@@ -88,18 +85,10 @@ namespace WorkflowRestAPISamples
             taskOperationsWorker.RedirectTask(k2WebClient, K2WFRESTENDPOINTURL + @"/tasks", taskSerialNo, USERNAME);
 
             //open and complete a task
-
-
             //End TASKS operations 
 
-
-
-            //Get_Workflows_RestAPI.Get_WorkflowSchema();
-            //Start_Workflow_RestAPI.Start_Workflow_Sample();            
-            //OpenAndCompleteTask.Open_Task_RESTAPI();
             //wait for user input
             Console.ReadLine();
-            //Get_Worklist_RestAPI.Retrieve_Worklist_RESTAPI();
         } 
     }   
 }

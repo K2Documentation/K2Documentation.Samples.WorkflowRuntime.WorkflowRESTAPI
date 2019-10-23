@@ -129,9 +129,6 @@ namespace WorkflowRestAPISamples
             {
                 Console.WriteLine("Datafield: " + dataField.Name);
             }
-            //Console.WriteLine("Number of variables (datafields):" + workflowSchema.properties.dataFields);
-            //Console.WriteLine("Number of properties:" + workflowSchema.properties.dataFields);
-            //Console.WriteLine("Number of properties:" + workflowSchema.properties.dataFields);
             Console.WriteLine("**************");
             //wait for user input
             Console.WriteLine("**GetWorkflowSchema done**");
@@ -152,14 +149,17 @@ namespace WorkflowRestAPISamples
 
             Console.WriteLine("**StartWorkflow starting**");
 
+            //build the URI and URL for the workflow instance endpoint
             string starttWorkflowOperationEndPoint = workflowsEndpointURI + @"/" + workflowId;
 
             //build up the workflow instance object (we will serialize this object later and pass it to the endpoint)
-            //see class definition for example of the WorkflowInstance class
+            //see the class definition for example of the WorkflowInstance class. in this sample we created a class definition for the specific workflow to start 
             WorkflowRestAPISamples.Workflows_WorkflowInstanceContract.WorkflowInstance wfInstance = new WorkflowRestAPISamples.Workflows_WorkflowInstanceContract.WorkflowInstance();
+            //set variables and other values for the new workflow instance
             wfInstance.Folio = System.DateTime.Now.Ticks.ToString();
             wfInstance.Priority = 1;
-            //instantiate and populate the datafields in the workflow
+            //instantiate and populate the datafields in the workflow, using the DataFields class for this specific workflow definition
+            //Note the data conversions. 
             wfInstance.DataFields = new Workflows_WorkflowInstanceContract.DataFields();
             wfInstance.DataFields.BooleanVariable = true;
             wfInstance.DataFields.DateTimeVariable = System.DateTime.Now;
@@ -167,6 +167,8 @@ namespace WorkflowRestAPISamples
             wfInstance.DataFields.NumberVariable = 99;
             wfInstance.DataFields.TextVariable = System.DateTime.Now.Ticks.ToString();
             wfInstance.DataFields.SampleSmartObjectRecordId = 1;
+            //set the ID of the reference item SmartObject. See https://help.k2.com/onlinehelp/k2five/DevRef/current/default.htm#Runtime/WF-REST-API/Workflow-REST-API-Item-References.htm for examples of setting item reference values
+            wfInstance.itemReferences.Sample_Workflow_REST_API_SmartObject._1.ID = 1;
 
             //serialize the workflow instance to JSON format and read it in
             DataContractJsonSerializer ser = new DataContractJsonSerializer(wfInstance.GetType());
@@ -174,14 +176,18 @@ namespace WorkflowRestAPISamples
             ser.WriteObject(ms, wfInstance);
 
             string encodedJsonObject = Encoding.UTF8.GetString(ms.ToArray());
-            //NOTE: if your datafield names have spaces, you may need to edit the serialized string to add the spaces back in. No idea why the serializer strips out spaces in the JSON. 
+            //NOTE: if your datafield names have spaces, you may need to edit the serialized string to add the spaces back in. 
             //e.g. encodedJsonObject = encodedJsonObject.Replace("TextDatafield", "Text Datafield");
             System.Net.Http.StringContent datacontent = new System.Net.Http.StringContent(encodedJsonObject, Encoding.UTF8, "application/json");
 
             //post the JSON data to the endpoint (for simplicity, we're not doing anything with threading and async here) 
             var result = WebClient.PostAsync(starttWorkflowOperationEndPoint, datacontent).Result;
-            //do something with the result, if needed
-            string resultStatus = result.StatusCode.ToString();
+
+            //check if operation was successful
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new Exception("Error in SleepTask:" + result.StatusCode.ToString() + ":" + result.ReasonPhrase);
+            }
 
             //wait for user input
             Console.WriteLine("**StartWorkflow done**");
