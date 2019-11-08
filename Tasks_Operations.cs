@@ -61,7 +61,7 @@ namespace WorkflowRestAPISamples
         public void SleepTask(System.Net.Http.HttpClient WebClient, string TasksEndpointURI, string TaskSerialNumber, int SleepIntervalSeconds)
         {
             Console.WriteLine("**SleepTask starting**");
-            Console.WriteLine("**Sleeping task " + TaskSerialNumber + " for " + SleepIntervalSeconds + "seconds");
+            Console.WriteLine("**Sleeping task " + TaskSerialNumber + " for " + SleepIntervalSeconds + " seconds");
             //construct the endpoint for the sleep operation (requires the task serial number)
             string sleepOperationEndPoint = TasksEndpointURI + @"/" + TaskSerialNumber + @"/actions/sleep";
 
@@ -184,6 +184,85 @@ namespace WorkflowRestAPISamples
             }
 
             Console.WriteLine("**RedirectTask done**");
+            //wait for user input to continue
+            Console.ReadLine();
+        }
+
+        /// <summary>
+        /// opens a task by assigning the task to the current user. (also known as 'allocate task to current user')
+        /// </summary>
+        /// <param name="WebClient">HttpClient set up with authentication credentials</param>
+        /// <param name="TasksEndpointURI">the URI of the workflow tasks endpoint (e.g. https://k2.denallix.com/api/workflow/v1/tasks) </param>
+        /// <param name="TaskSerialNumber">the unique serial number of the task you want to allocate/assign to the current user</param>
+        public void UpdateAndCompleteTask(System.Net.Http.HttpClient WebClient, string TasksEndpointURI, string TaskSerialNumber)
+        {
+            Console.WriteLine("**UpdateAndCompleteTask starting**");
+            Console.WriteLine("**Opening task " + TaskSerialNumber);
+            //construct the endpoint for the assign/open operation (requires the task serial number)
+            string taskOperationEndPoint = TasksEndpointURI + @"/" + TaskSerialNumber;
+
+            string responseBody = WebClient.GetStringAsync(taskOperationEndPoint).Result;
+            WorkflowRestAPISamples.Tasks_TaskContract.K2Task task = new WorkflowRestAPISamples.Tasks_TaskContract.K2Task();
+            //WorkflowRestAPI.Task.K2Task task = new WorkflowRestAPI.Task.K2Task();
+            using (System.IO.MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(responseBody)))
+            {
+                DataContractJsonSerializer ser = new DataContractJsonSerializer(task.GetType());
+                task = ser.ReadObject(ms) as WorkflowRestAPISamples.Tasks_TaskContract.K2Task;
+            }
+
+            //Do something with the task/workflow instance information
+            Console.WriteLine("Workflow Name" + task.WorkflowName);
+            Console.WriteLine("Activity Name: " + task.ActivityName);
+            Console.WriteLine("Folio: " + task.WorkflowInstanceFolio);
+            Console.WriteLine("Available Actions: "); 
+            foreach (string systemAction in task.Actions.SystemActions)
+            {
+                Console.WriteLine("System Action: " + systemAction);
+            }
+            foreach (string batchAction in task.Actions.BatchableActions)
+            {
+                Console.WriteLine("Batchable Action: " + batchAction);
+            }
+            foreach (string nonbatchAction in task.Actions.NonBatchableActions)
+            {
+                Console.WriteLine("Non-Batchable Action: " + nonbatchAction);
+            }
+            Console.WriteLine("*********");
+
+            //determine a random action to take on the task
+            Random randomizer = new Random();
+            string randomActionName = task.Actions.BatchableActions[randomizer.Next(0, task.Actions.BatchableActions.Count)];
+
+            Console.WriteLine("Completing the task with random action: " + randomActionName);
+
+            string actionEndpointURI = TasksEndpointURI + @"/" + TaskSerialNumber + @"/actions/" + randomActionName;
+            //if you want to update workflow datafields/variables when completing the task, 
+            //you need to define the datafields and serialize them as a JSON string. 
+            //Either hardcode the string as in this example, or create your own DataContract class and serialize it
+            //string datafieldsToUpdateJSON = "{\"dataFields\":{\"TextVariable\": \"newValueForTextVariable\"}}";
+            //example using a data contract and serialization 
+            Tasks_TaskContract.WorkflowInstanceDataFields wfDatafields = new Tasks_TaskContract.WorkflowInstanceDataFields();
+            wfDatafields.TextVariable = "newStringValue";
+            wfDatafields.DecimalVariable = (long)999.99;
+            wfDatafields.NumberVariable = 99;
+           
+            //serialize the datafields to JSON format and read it in
+            DataContractJsonSerializer ser1 = new DataContractJsonSerializer(wfDatafields.GetType());
+            System.IO.MemoryStream ms1 = new System.IO.MemoryStream();
+            ser1.WriteObject(ms1, wfDatafields);
+
+            string encodedJsonObject = Encoding.UTF8.GetString(ms1.ToArray());
+            //NOTE: if your datafield names have spaces, you may need to edit the serialized string to add the spaces back in. 
+            //e.g. encodedJsonObject = encodedJsonObject.Replace("TextDatafield", "Text Datafield");
+            //wrap the encodedJsonObject into a root class if necessary, in this case datafield
+            encodedJsonObject = "{dataFields:" + encodedJsonObject + "}";
+            System.Net.Http.StringContent datacontent = new System.Net.Http.StringContent(encodedJsonObject, Encoding.UTF8, "application/json");
+
+            var completeResult = WebClient.PostAsync(actionEndpointURI, datacontent).Result;
+            //do something with the result, if needed
+            string completeResultStatus = completeResult.StatusCode.ToString();
+
+            Console.WriteLine("**UpdateAndCompleteTask done**");
             //wait for user input to continue
             Console.ReadLine();
         }

@@ -161,7 +161,14 @@ namespace WorkflowRestAPISamples.Tasks_TaskContract
         }
 
         [DataMember(Name = "workflowInstanceDataFields")]
-        public ActivityDataFields WorkflowInstanceDataFields
+        public WorkflowInstanceDataFields WorkflowInstanceDataFields
+        {
+            get;
+            set;
+        }
+
+        [DataMember(Name = "dataFields")]
+        public WorkflowInstanceDataFields DataFields
         {
             get;
             set;
@@ -201,6 +208,13 @@ namespace WorkflowRestAPISamples.Tasks_TaskContract
             get;
             set;
         }
+
+        //[DataMember(Name = "dataFields")]
+        //public DataFields DataFields
+        //{
+            //get;
+            //set;
+        //}
     }
 
 
@@ -289,5 +303,40 @@ namespace WorkflowRestAPISamples.Tasks_TaskContract
             get;
             set;
         }
+    }
+
+    /// <summary>
+    /// Class that describes the datafields (variables) defined in the workflow. This class is specific to the definition of the workflow
+    /// You will need to set up this class based on the datafields defined for your workflow. Review the variables in the workflow to set up the necessary properties for this class
+    /// Set the .NET datatype for the DataMembers to the appropriate value that will parse to the underlying datafield/variable type 
+    /// You can use the GET /api/workflow/v1/workflows/{id}/schema endpoint to discover the data fields defined for the workflow
+    /// </summary>
+    [DataContract]
+    public class WorkflowInstanceDataFields
+    {
+        //TODO: Define as many fields as needed based on the workflow definition.
+        //[DATAFIELDNAME] is the name of a datafield/variable defined within your workflow.
+        //[DataMember(Name = "[DATAFIELDNAME]")]
+        //public string [DATAFIELDNAME] { get; set; }
+
+        [DataMember(Name = "TextVariable")]
+        public string TextVariable { get; set; }
+
+        [DataMember(Name = "NumberVariable")]
+        public int NumberVariable { get; set; }
+
+        [DataMember(Name = "BooleanVariable")]
+        public Boolean BooleanVariable { get; set; }
+
+        [DataMember(Name = "DecimalVariable")]
+        public long DecimalVariable { get; set; }
+
+        [DataMember(Name = "SampleSmartObjectRecordId")]
+        public int SampleSmartObjectRecordId { get; set; }
+    }
+
+    public class K2TaskUpdate
+    {
+
     }
 }

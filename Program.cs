@@ -37,11 +37,15 @@ namespace WorkflowRestAPISamples
             //workflows endpoint operations 
             Workflows_Operations workflowOperationsWorker = new Workflows_Operations();
             //retrieve a list of the workflows the user can start
-            //workflowOperationsWorker.GetWorkflows(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows");
+            int sampleWorkflowID = workflowOperationsWorker.GetWorkflows(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows");
 
             //describe a specific workflow's metadata
-            Console.WriteLine("Enter Id of a workflow to view its metadata");
+            Console.WriteLine("Enter Id of a workflow to view its metadata (leave blank to read metadata for sample workflow with ID:" + sampleWorkflowID.ToString());
             string workflowId = Console.ReadLine();
+            if (workflowId == null || workflowId == String.Empty)
+            {
+                workflowId = sampleWorkflowID.ToString();
+            }
             workflowOperationsWorker.GetWorkflowMetaData(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows", workflowId);
 
             //retrieve the schema of the workflow definition (not implemented in this sample yet, schema data not being deserialized)
@@ -49,8 +53,12 @@ namespace WorkflowRestAPISamples
 
             //start a new instance of the sample workflow that accompanies this sample project
             //NOTE: you must pass in the ID of the sample workflow, because the workflow instance object is defined based on the sample workflow
-            Console.WriteLine("Enter Id of the sample workflow that accompanies this project to start a new instance");
+            Console.WriteLine("Enter Id of the sample workflow that accompanies this project to start a new instance (leave blank to read metadata for sample workflow with ID:" + sampleWorkflowID.ToString());
             workflowId = Console.ReadLine();
+            if (workflowId == null || workflowId == String.Empty)
+            {
+                workflowId = sampleWorkflowID.ToString();
+            }
             workflowOperationsWorker.StartWorkflow(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows", workflowId);
 
             //Start TASKS operations 
@@ -85,6 +93,11 @@ namespace WorkflowRestAPISamples
             taskOperationsWorker.RedirectTask(k2WebClient, K2WFRESTENDPOINTURL + @"/tasks", taskSerialNo, USERNAME);
 
             //open and complete a task
+            //first we need to open (allocate) a task
+            taskOperationsWorker.OpenTask(k2WebClient, K2WFRESTENDPOINTURL + @"/tasks", taskSerialNo);
+            //retrieve the task and read task details
+            taskOperationsWorker.UpdateAndCompleteTask(k2WebClient, K2WFRESTENDPOINTURL + @"/tasks", taskSerialNo);
+
             //End TASKS operations 
 
             //wait for user input

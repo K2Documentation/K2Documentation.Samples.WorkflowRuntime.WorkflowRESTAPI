@@ -22,11 +22,11 @@ namespace WorkflowRestAPISamples
         /// </summary>
         /// <param name="WebClient">HttpClient set up with authentication credentials</param>
         /// <param name="WorkflowRestAPIURL">the root URL of the Workflow REST Service (e.g. https://k2.denallix.com/api/workflow/v1) </param>
-        public void GetWorkflows(System.Net.Http.HttpClient WebClient, string workflowsEndpointURI)
+        public int GetWorkflows(System.Net.Http.HttpClient WebClient, string workflowsEndpointURI)
         {
 
             Console.WriteLine("**GetWorkflows starting**");
-
+            int sampleWorkflowDefinitionId = 0; 
             //retrieve the authenticated user's available workflows as JSON
             string response = WebClient.GetStringAsync(workflowsEndpointURI).Result;
 
@@ -49,11 +49,17 @@ namespace WorkflowRestAPISamples
                 Console.WriteLine("Workflow Name: " + workflow.Name);
                 Console.WriteLine("Folder: " + workflow.Folder);
                 Console.WriteLine("System Name: " + workflow.SystemName);
+                if (workflow.Name == "Sample Workflow REST API")
+                {
+                    sampleWorkflowDefinitionId = workflow.Id;
+                }
                 Console.WriteLine("**************");
             }
             //wait for user input
             Console.WriteLine("**GetWorkflows done**");
             Console.ReadLine();
+            //return the ID of the sample workflow that accompanies this project, so that we can start an instace later
+            return sampleWorkflowDefinitionId;
         }
 
         /// <summary>
@@ -156,7 +162,7 @@ namespace WorkflowRestAPISamples
             //see the class definition for example of the WorkflowInstance class. in this sample we created a class definition for the specific workflow to start 
             WorkflowRestAPISamples.Workflows_WorkflowInstanceContract.WorkflowInstance wfInstance = new WorkflowRestAPISamples.Workflows_WorkflowInstanceContract.WorkflowInstance();
             //set variables and other values for the new workflow instance
-            wfInstance.Folio = System.DateTime.Now.Ticks.ToString();
+            wfInstance.Folio = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             wfInstance.Priority = 1;
             //instantiate and populate the datafields in the workflow, using the DataFields class for this specific workflow definition
             //Note the data conversions. 
@@ -168,6 +174,10 @@ namespace WorkflowRestAPISamples
             wfInstance.DataFields.TextVariable = System.DateTime.Now.Ticks.ToString();
             wfInstance.DataFields.SampleSmartObjectRecordId = 1;
             //set the ID of the reference item SmartObject. See https://help.k2.com/onlinehelp/k2five/DevRef/current/default.htm#Runtime/WF-REST-API/Workflow-REST-API-Item-References.htm for examples of setting item reference values
+            //ItemReferences instanceItemReferences = new ItemReferences();           
+            wfInstance.itemReferences = new Workflows_WorkflowInstanceContract.Itemreferences();
+            wfInstance.itemReferences.Sample_Workflow_REST_API_SmartObject = new Workflows_WorkflowInstanceContract.Sample_Workflow_REST_API_Smartobject();
+            wfInstance.itemReferences.Sample_Workflow_REST_API_SmartObject._1 = new Workflows_WorkflowInstanceContract._1();
             wfInstance.itemReferences.Sample_Workflow_REST_API_SmartObject._1.ID = 1;
 
             //serialize the workflow instance to JSON format and read it in
