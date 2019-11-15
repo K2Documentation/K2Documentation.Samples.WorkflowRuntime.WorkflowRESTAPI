@@ -203,7 +203,6 @@ namespace WorkflowRestAPISamples
 
             string responseBody = WebClient.GetStringAsync(taskOperationEndPoint).Result;
             WorkflowRestAPISamples.Tasks_TaskContract.K2Task task = new WorkflowRestAPISamples.Tasks_TaskContract.K2Task();
-            //WorkflowRestAPI.Task.K2Task task = new WorkflowRestAPI.Task.K2Task();
             using (System.IO.MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(responseBody)))
             {
                 DataContractJsonSerializer ser = new DataContractJsonSerializer(task.GetType());
@@ -263,6 +262,39 @@ namespace WorkflowRestAPISamples
             string completeResultStatus = completeResult.StatusCode.ToString();
 
             Console.WriteLine("**UpdateAndCompleteTask done**");
+            //wait for user input to continue
+            Console.ReadLine();
+        }
+
+        /// <summary>
+        /// Method to complete a 'waiting' task in the 'Wait for External System' workflow sample that accompanies this project
+        /// Note: the account that calls the /finish endpoint for the task requires the ServerEvent right on the workflow
+        /// </summary>
+        /// <param name="WebClient"></param>
+        /// <param name="TasksEndpointURI"></param>
+        /// <param name="TaskSerialNumber"></param>
+        /// <param name="ExternalSystemResponse">some random text that represents the result from the external system</param>
+        public void UpdateAndCompleteExternalSystemTask(System.Net.Http.HttpClient WebClient, string TasksEndpointURI, string TaskSerialNumber, string ExternalSystemResponse)
+        {
+            Console.WriteLine("**UpdateAndCompleteExternalSystemTask starting**");
+            Console.WriteLine("**Completing server task " + TaskSerialNumber);
+            //construct the endpoint for the finish operation (requires the task serial number)
+            string taskOperationEndPoint = TasksEndpointURI + @"/" + TaskSerialNumber + "/finish";
+
+            // Build the JSON string to send back datafields with data, if necessary. In this example, we're passing back a random response value from this external application
+            // through a datafield called "ExternalSystemResponse", which corresponds to a variable defined in the running instance of the K2 workflow.
+            string userDefinedFields = "{\"dataFields\": { \"ExternalSystemResponse\": \"" + ExternalSystemResponse + "\"}}";
+            System.Net.Http.StringContent httpContent = new StringContent(userDefinedFields, Encoding.UTF8, "application/json");
+
+            var requestResult = WebClient.PostAsync(taskOperationEndPoint, httpContent).Result;
+
+            //check if operation was successful
+            if (!requestResult.IsSuccessStatusCode)
+            {
+                throw new Exception("Error in UpdateAndCompleteExternalSystemTask:" + requestResult.StatusCode.ToString() + ":" + requestResult.ReasonPhrase);
+            }
+
+            Console.WriteLine("**UpdateAndCompleteExternalSystemTask done**");
             //wait for user input to continue
             Console.ReadLine();
         }

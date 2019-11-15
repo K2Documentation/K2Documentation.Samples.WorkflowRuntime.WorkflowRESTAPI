@@ -37,7 +37,7 @@ namespace WorkflowRestAPISamples
             //workflows endpoint operations 
             Workflows_Operations workflowOperationsWorker = new Workflows_Operations();
             //retrieve a list of the workflows the user can start
-            int sampleWorkflowID = workflowOperationsWorker.GetWorkflows(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows");
+            int sampleWorkflowID = workflowOperationsWorker.GetWorkflows(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows", "Sample Workflow REST API");
 
             //describe a specific workflow's metadata
             Console.WriteLine("Enter Id of a workflow to view its metadata (leave blank to read metadata for sample workflow with ID:" + sampleWorkflowID.ToString());
@@ -47,9 +47,6 @@ namespace WorkflowRestAPISamples
                 workflowId = sampleWorkflowID.ToString();
             }
             workflowOperationsWorker.GetWorkflowMetaData(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows", workflowId);
-
-            //retrieve the schema of the workflow definition (not implemented in this sample yet, schema data not being deserialized)
-            //WorkflowRestAPISamples.Workflows_WorkflowSchemaContract.WorkflowSchema workflowSchema = workflowOperationsWorker.GetWorkflowSchema(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows", workflowId);
 
             //start a new instance of the sample workflow that accompanies this sample project
             //NOTE: you must pass in the ID of the sample workflow, because the workflow instance object is defined based on the sample workflow
@@ -100,8 +97,16 @@ namespace WorkflowRestAPISamples
 
             //End TASKS operations 
 
+            //Wait for External Workflow Sample
+            //start an instance of the sample workflow with the 'wait for external system' SmartObject step
+            workflowOperationsWorker.StartWaitforExternalSystemSample(k2WebClient, K2WFRESTENDPOINTURL + @"/workflows");
             //wait for user input
-            Console.ReadLine();
+            Console.WriteLine("Started instance. Execute the list method of the SmartObject 'Sample Workflow REST API External System SmartObject' to retrieve a list of serial numbers for Waiting tasks");
+            Console.WriteLine("Enter a serial number for a Waiting task to complete:");
+            string serialNumber = Console.ReadLine();
+            Console.WriteLine("Enter some text as the return value from the external system (it doesn't matter what the text is):");
+            string systemResponse = Console.ReadLine();
+            taskOperationsWorker.UpdateAndCompleteExternalSystemTask(k2WebClient, K2WFRESTENDPOINTURL + @"/serverEvents", serialNumber, systemResponse);
         } 
     }   
 }

@@ -232,9 +232,6 @@ namespace WorkflowRestAPISamples.Tasks_TasklistContract
 
         [DataMember(Name = "username")]
         public string Username
-        {
-            get;
-            set;
-        }
+        { get; set; }
     }
 }

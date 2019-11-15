@@ -334,9 +334,4 @@ namespace WorkflowRestAPISamples.Tasks_TaskContract
         [DataMember(Name = "SampleSmartObjectRecordId")]
         public int SampleSmartObjectRecordId { get; set; }
     }
-
-    public class K2TaskUpdate
-    {
-
-    }
 }
