@@ -150,7 +150,7 @@ namespace WorkflowRestAPISamples
         /// <param name="WebClient">HttpClient set up with authentication credentials</param>
         /// <param name="WorkflowRestAPIURL">the root URL of the Workflow REST Service (e.g. https://k2.denallix.com/api/workflow/v1) </param>
         /// <param name="workflowId">the workflow definition ID of the sample workflow that accompanies this project</param>
-        public void StartWorkflow(System.Net.Http.HttpClient WebClient, string workflowsEndpointURI, string workflowId)
+        public async void StartWorkflow(System.Net.Http.HttpClient WebClient, string workflowsEndpointURI, string workflowId)
         {
 
             Console.WriteLine("**StartWorkflow starting**");
@@ -192,6 +192,8 @@ namespace WorkflowRestAPISamples
 
             //post the JSON data to the endpoint (for simplicity, we're not doing anything with threading and async here) 
             var result = WebClient.PostAsync(starttWorkflowOperationEndPoint, datacontent).Result;
+            //if you need to read in the resulting workflow instance ID, read the result content
+            var workflowInstanceId = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             //check if operation was successful
             if (!result.IsSuccessStatusCode)
